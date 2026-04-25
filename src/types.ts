@@ -17,6 +17,8 @@ export interface Incident {
   type: IncidentType;
   severity: Severity;
   confidence: Confidence;
+  /** Trust score 0-100. Government CSV = 100. User reports start lower, grow with confirmations. */
+  points: number;
   description: string;
   lat: number;
   lng: number;

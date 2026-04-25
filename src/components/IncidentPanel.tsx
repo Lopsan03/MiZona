@@ -22,6 +22,7 @@ import {
 import { Incident, IncidentType } from '../types';
 import { useWallet } from '../contexts/WalletContext';
 import { categoryLabels, Language, uiText } from '../i18n';
+import { confidenceLabel } from '../trustScore';
 
 interface IncidentPanelProps {
   incident: Incident | null;
@@ -98,16 +99,29 @@ export default function IncidentPanel({ incident, onClose, onConfirm, language }
 
               <div className="grid grid-cols-2 gap-3 mb-6">
                 <div className="bg-slate-50/50 dark:bg-slate-800/50 rounded-xl p-3 border border-slate-100 dark:border-slate-700">
-                  <div className="text-[10px] text-slate-400 uppercase font-bold mb-1 tracking-wider text-left">{copy.reporterStatus}</div>
+                  <div className="text-[10px] text-slate-400 uppercase font-bold mb-1 tracking-wider text-left">Confianza</div>
                   <div className="flex items-center gap-2">
-                    <span className="text-sm font-bold text-slate-800 dark:text-slate-200">{incident.reporter.reputation} Points</span>
-                    <span className="text-green-500 text-[10px] font-bold">{copy.highTrust}</span>
+                    <span className={`text-sm font-bold ${
+                      incident.confidence === 'confirmed' ? 'text-green-600 dark:text-green-400' :
+                      incident.confidence === 'disputed'  ? 'text-amber-600 dark:text-amber-400' :
+                                                           'text-slate-500 dark:text-slate-400'
+                    }`}>{incident.points} pts</span>
+                    <span className={`text-[10px] font-bold uppercase tracking-wide ${
+                      incident.confidence === 'confirmed' ? 'text-green-500' :
+                      incident.confidence === 'disputed'  ? 'text-amber-500' :
+                                                           'text-slate-400'
+                    }`}>{confidenceLabel[language][incident.confidence]}</span>
                   </div>
                 </div>
                 <div className="bg-slate-50/50 dark:bg-slate-800/50 rounded-xl p-3 border border-slate-100 dark:border-slate-700">
-                  <div className="text-[10px] text-slate-400 uppercase font-bold mb-1 tracking-wider text-left">{copy.confidence}</div>
+                  <div className="text-[10px] text-slate-400 uppercase font-bold mb-1 tracking-wider text-left">{copy.confirmations}</div>
                   <div className="flex items-center gap-2 text-left">
-                    <span className="text-sm font-bold text-slate-800 dark:text-slate-200">{incident.confirmations} {copy.confirmations}</span>
+                    <span className="text-sm font-bold text-slate-800 dark:text-slate-200">{incident.confirmations}</span>
+                    {incident.points < 70 && (
+                      <span className="text-[10px] text-slate-400">
+                        +{Math.ceil((70 - incident.points) / 8)} para Alta
+                      </span>
+                    )}
                   </div>
                 </div>
               </div>

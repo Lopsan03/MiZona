@@ -187,7 +187,9 @@ const parseCsvToIncidents = (csvContent: string): Incident[] => {
       id: `gdl-${index}`,
       type: mapDelitoToType(delito),
       severity: mapDelitoToSeverity(delito),
+      // Government data: maximum trust, no community confirmation needed.
       confidence: 'confirmed',
+      points: 100,
       description: buildDescription(row),
       lat,
       lng,

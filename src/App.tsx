@@ -17,6 +17,7 @@ import LandingPage from './components/LandingPage';
 import { PrivyProvider } from '@privy-io/react-auth';
 import { Language, uiText } from './i18n';
 import { publishIncidentToMonad, fetchBlockchainIncidents, convertBlockchainIncidentsToApp } from './blockchain/incidentRegistry';
+import { calcPoints, pointsToConfidence, POINTS_PER_CONFIRMATION, clampPoints } from './trustScore';
 import { Incident, SafeRoutePlan } from './types';
 import { CSV_INCIDENTS, GUADALAJARA_CENTER } from './data/incidentsFromCsv';
 import { buildSafeRoutePlan } from './routing/safeRoute';
@@ -150,11 +151,13 @@ function AppContent({ onBackToLanding }: AppContentProps) {
       ethereumProvider,
     });
 
+    const initialPoints = calcPoints(data.type, 0);
     const newIncident: Incident = {
       id: Math.random().toString(36).substr(2, 9),
       type: data.type,
       severity: data.severity,
-      confidence: 'pending',
+      points: initialPoints,
+      confidence: pointsToConfidence(initialPoints),
       description: data.description,
       lat,
       lng,
@@ -173,10 +176,15 @@ function AppContent({ onBackToLanding }: AppContentProps) {
   const handleConfirmIncident = (id: string) => {
     setIncidents(prev => prev.map(inc => {
       if (inc.id === id) {
+        // Government CSV incidents stay at 100 — don't override them.
+        if (inc.points === 100) return { ...inc, confirmations: inc.confirmations + 1 };
+        const newConfirmations = inc.confirmations + 1;
+        const newPoints = clampPoints(inc.points + POINTS_PER_CONFIRMATION);
         return {
           ...inc,
-          confirmations: inc.confirmations + 1,
-          confidence: inc.confirmations + 1 >= 5 ? 'confirmed' : inc.confidence
+          confirmations: newConfirmations,
+          points: newPoints,
+          confidence: pointsToConfidence(newPoints),
         };
       }
       return inc;

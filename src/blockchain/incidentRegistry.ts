@@ -13,6 +13,7 @@ import {
 import { monadTestnet } from 'viem/chains';
 import { IncidentType, Severity, Incident } from '../types';
 import { Language } from '../i18n';
+import { calcPoints, pointsToConfidence } from '../trustScore';
 
 const INCIDENT_REGISTRY_ABI = [
   {
@@ -212,7 +213,8 @@ export const convertBlockchainIncidentsToApp = (blockchainIncidents: any[]): Inc
       id: `blockchain-${id}`,
       type: incident.incidentType as IncidentType,
       severity: incident.severity as Severity,
-      confidence: confirmations > 0 ? 'confirmed' : 'pending',
+      points: calcPoints(incident.incidentType as IncidentType, confirmations),
+      confidence: pointsToConfidence(calcPoints(incident.incidentType as IncidentType, confirmations)),
       description: incident.description,
       lat: latE6 / 1_000_000,
       lng: lngE6 / 1_000_000,
