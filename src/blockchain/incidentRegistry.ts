@@ -109,11 +109,10 @@ export const publishIncidentToMonad = async (input: PublishIncidentInput): Promi
     return null;
   }
 
-  // Use backend service to sponsor gas
-  const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
+  const backendUrl = (import.meta.env.VITE_BACKEND_URL || '/api').replace(/\/$/, '');
   
   try {
-    const response = await fetch(`${backendUrl}/api/incidents/report`, {
+    const response = await fetch(`${backendUrl}/incidents/report`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
