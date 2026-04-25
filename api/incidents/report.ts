@@ -74,8 +74,14 @@ export default async function handler(request: Request) {
     const contractAddress = process.env.VITE_INCIDENT_REGISTRY_ADDRESS as Address | undefined;
 
     if (!privateKey || !contractAddress) {
-      return json({ success: false, error: 'Server is missing blockchain environment variables' }, { status: 500 });
+      const missingVars = [];
+      if (!privateKey) missingVars.push('MONAD_PRIVATE_KEY');
+      if (!contractAddress) missingVars.push('VITE_INCIDENT_REGISTRY_ADDRESS');
+      console.error('Missing environment variables:', missingVars);
+      return json({ success: false, error: `Server configuration error: Missing ${missingVars.join(', ')}` }, { status: 500 });
     }
+
+    console.log('Processing incident report:', { type, severity, lat, lng });
 
     const account = privateKeyToAccount(privateKey);
     const walletClient = createWalletClient({
@@ -89,6 +95,7 @@ export default async function handler(request: Request) {
       transport: http(monadTestnet.rpcUrls.default.http[0]),
     });
 
+    console.log('Simulating contract call...');
     const { request: contractRequest } = await publicClient.simulateContract({
       account,
       address: contractAddress,
@@ -104,9 +111,20 @@ export default async function handler(request: Request) {
       ],
     });
 
+    console.log('Writing contract...');
     const hash = await walletClient.writeContract(contractRequest);
-    const receipt = await publicClient.waitForTransactionReceipt({ hash });
+    console.log('Transaction hash:', hash);
+    
+    // Wait for transaction receipt with a 120-second timeout
+    console.log('Waiting for transaction confirmation (max 120 seconds)...');
+    const receipt = await Promise.race([
+      publicClient.waitForTransactionReceipt({ hash }),
+      new Promise<never>((_, reject) => 
+        setTimeout(() => reject(new Error('Transaction confirmation timeout: The transaction was submitted but took too long to confirm. Please check the explorer.')), 120000)
+      )
+    ]);
 
+    console.log('Transaction confirmed:', receipt.transactionHash);
     return json({
       success: true,
       transactionHash: hash,
@@ -114,6 +132,7 @@ export default async function handler(request: Request) {
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown error occurred';
+    console.error('Incident report error:', message, error);
     return json({ success: false, error: message }, { status: 500 });
   }
 }

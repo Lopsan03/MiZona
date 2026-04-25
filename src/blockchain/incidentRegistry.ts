@@ -112,6 +112,9 @@ export const publishIncidentToMonad = async (input: PublishIncidentInput): Promi
   const backendUrl = (import.meta.env.VITE_BACKEND_URL || '/api').replace(/\/$/, '');
   
   try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 150000); // 2.5 minute timeout
+    
     const response = await fetch(`${backendUrl}/incidents/report`, {
       method: 'POST',
       headers: {
@@ -125,7 +128,10 @@ export const publishIncidentToMonad = async (input: PublishIncidentInput): Promi
         lng: input.lng,
         language: input.language,
       }),
+      signal: controller.signal,
     });
+
+    clearTimeout(timeoutId);
 
     if (!response.ok) {
       const error = await response.json();
@@ -135,6 +141,9 @@ export const publishIncidentToMonad = async (input: PublishIncidentInput): Promi
     const result = await response.json();
     return result.transactionHash || null;
   } catch (error) {
+    if (error instanceof Error && error.name === 'AbortError') {
+      throw new Error('Report submission timed out. Please try again or check your internet connection.');
+    }
     const message = error instanceof Error ? error.message : 'Failed to submit report';
     throw new Error(message);
   }
