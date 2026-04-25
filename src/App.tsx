@@ -12,17 +12,16 @@ import FilterBar, { FilterType, TimeFilter } from './components/FilterBar';
 import FloatingUI from './components/FloatingUI';
 import IncidentPanel from './components/IncidentPanel';
 import ReportForm from './components/ReportForm';
-import WalletModal from './components/WalletModal';
+import { PrivyProvider } from '@privy-io/react-auth';
 import { Incident } from './types';
 import { CSV_INCIDENTS, GUADALAJARA_CENTER } from './data/incidentsFromCsv';
 
 function AppContent() {
-  const { wallet } = useWallet();
+  const { wallet, connect } = useWallet();
   const [incidents, setIncidents] = useState<Incident[]>(CSV_INCIDENTS);
   const [userLocation, setUserLocation] = useState<[number, number] | null>(null);
   const [selectedIncident, setSelectedIncident] = useState<Incident | null>(null);
   const [isReportOpen, setIsReportOpen] = useState(false);
-  const [isWalletModalOpen, setIsWalletModalOpen] = useState(false);
   
   // Filters
   const [activeType, setActiveType] = useState<FilterType>('all');
@@ -107,7 +106,7 @@ function AppContent() {
         defaultCenter={GUADALAJARA_CENTER}
       />
 
-      <TopBar onConnectClick={() => setIsWalletModalOpen(true)} />
+      <TopBar onConnectClick={connect} />
       
       <FilterBar 
         activeType={activeType} 
@@ -119,7 +118,7 @@ function AppContent() {
       <FloatingUI 
         count={filteredIncidents.length} 
         onReportClick={() => setIsReportOpen(true)}
-        onConnectClick={() => setIsWalletModalOpen(true)}
+        onConnectClick={connect}
       />
 
       <IncidentPanel 
@@ -132,12 +131,7 @@ function AppContent() {
         isOpen={isReportOpen} 
         onClose={() => setIsReportOpen(false)}
         onSubmit={handleReportSubmit}
-        onConnectClick={() => setIsWalletModalOpen(true)}
-      />
-
-      <WalletModal 
-        isOpen={isWalletModalOpen}
-        onClose={() => setIsWalletModalOpen(false)}
+        onConnectClick={connect}
       />
     </div>
   );
@@ -145,10 +139,18 @@ function AppContent() {
 
 export default function App() {
   return (
-    <ThemeProvider>
-      <WalletProvider>
-        <AppContent />
-      </WalletProvider>
-    </ThemeProvider>
+    <PrivyProvider
+      appId={import.meta.env.VITE_PRIVY_APP_ID}
+      config={{
+        loginMethods: ['wallet', 'email', 'google'],
+        appearance: { theme: 'light', accentColor: '#0f172a' },
+      }}
+    >
+      <ThemeProvider>
+        <WalletProvider>
+          <AppContent />
+        </WalletProvider>
+      </ThemeProvider>
+    </PrivyProvider>
   );
 }
