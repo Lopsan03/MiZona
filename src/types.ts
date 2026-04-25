@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-export type IncidentType = 'robbery' | 'weapon' | 'suspicious' | 'lighting' | 'other';
+export type IncidentType = 'robbery' | 'assault' | 'homicide' | 'kidnapping' | 'sexualCrime' | 'drugActivity' | 'other';
 export type Severity = 'high' | 'medium';
 export type Confidence = 'confirmed' | 'pending' | 'disputed';
 
@@ -24,6 +24,23 @@ export interface Incident {
   reporter: Reporter;
   confirmations: number;
   similarNearby: number;
+}
+
+export interface RouteOption {
+  id: string;
+  geometry: [number, number][];
+  distanceMeters: number;
+  durationSeconds: number;
+  riskScore: number;
+  blockedHighCount: number;
+  cautionCount: number;
+}
+
+export interface SafeRoutePlan {
+  destinationName: string;
+  destination: [number, number];
+  selectedRouteId: string;
+  routes: RouteOption[];
 }
 
 export interface WalletState {

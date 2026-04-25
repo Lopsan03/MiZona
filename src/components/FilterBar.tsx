@@ -5,6 +5,7 @@
 
 import React from 'react';
 import { motion } from 'motion/react';
+import { Language, uiText } from '../i18n';
 
 export type FilterType = 'all' | 'high' | 'confirmed';
 export type TimeFilter = 'all' | '30m' | '1h' | '24h';
@@ -14,19 +15,21 @@ interface FilterBarProps {
   setActiveType: (type: FilterType) => void;
   activeTime: TimeFilter;
   setActiveTime: (time: TimeFilter) => void;
+  language: Language;
 }
 
-export default function FilterBar({ activeType, setActiveType, activeTime, setActiveTime }: FilterBarProps) {
+export default function FilterBar({ activeType, setActiveType, activeTime, setActiveTime, language }: FilterBarProps) {
+  const copy = uiText[language];
   const typeFilters: { id: FilterType; label: string }[] = [
-    { id: 'all', label: 'All Incidents' },
-    { id: 'high', label: 'High Severity' },
-    { id: 'confirmed', label: 'Confirmed Only' },
+    { id: 'all', label: copy.allIncidents },
+    { id: 'high', label: copy.highSeverity },
+    { id: 'confirmed', label: copy.confirmedOnly },
   ];
 
   const timeFilters: { id: TimeFilter; label: string }[] = [
-    { id: 'all', label: 'All Time' },
-    { id: '1h', label: 'Last 1h' },
-    { id: '24h', label: 'Last 24h' },
+    { id: 'all', label: copy.allTime },
+    { id: '1h', label: copy.last1h },
+    { id: '24h', label: copy.last24h },
   ];
 
   return (

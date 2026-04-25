@@ -42,7 +42,7 @@ export default function WalletModal({ isOpen, onClose }: WalletModalProps) {
               <div className="flex items-center justify-between mb-8">
                 <div>
                   <h3 className="text-2xl font-bold">Connect Identity</h3>
-                  <p className="text-sm text-slate-400 font-medium">Verify your citizenship on Sentinel</p>
+                  <p className="text-sm text-slate-400 font-medium">Verify your citizenship on MiZona</p>
                 </div>
                 <button onClick={onClose} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors text-slate-400">
                   <X size={24} />

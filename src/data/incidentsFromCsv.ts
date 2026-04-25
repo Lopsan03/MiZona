@@ -46,20 +46,28 @@ const parseCsvLine = (line: string): string[] => {
 const mapDelitoToType = (delito: string): IncidentType => {
   const normalized = normalizeText(delito);
 
-  if (/(arma|homicidio|feminicidio|secuestro|balaceo|disparo)/.test(normalized)) {
-    return 'weapon';
+  if (/(homicidio|feminicidio|disparo|balaceo|asesinato)/.test(normalized)) {
+    return 'homicide';
+  }
+
+  if (/(secuestro|privacion de la libertad)/.test(normalized)) {
+    return 'kidnapping';
+  }
+
+  if (/(abuso sexual|violacion|acoso sexual|hostigamiento sexual)/.test(normalized)) {
+    return 'sexualCrime';
+  }
+
+  if (/(narcomenudeo|droga|estupefaciente|posesion de drogas|trafico)/.test(normalized)) {
+    return 'drugActivity';
   }
 
   if (/(robo|asalto|extorsion|fraude|despojo)/.test(normalized)) {
     return 'robbery';
   }
 
-  if (/(alumbrado|luz|iluminacion)/.test(normalized)) {
-    return 'lighting';
-  }
-
-  if (/(abuso|acoso|violencia|amenaza|lesion|sospech)/.test(normalized)) {
-    return 'suspicious';
+  if (/(lesion|violencia|amenaza|golpe|agresion)/.test(normalized)) {
+    return 'assault';
   }
 
   return 'other';
@@ -67,7 +75,7 @@ const mapDelitoToType = (delito: string): IncidentType => {
 
 const mapDelitoToSeverity = (delito: string): Severity => {
   const normalized = normalizeText(delito);
-  return /(arma|homicidio|feminicidio|secuestro|robo|asalto|violacion)/.test(normalized)
+  return /(homicidio|feminicidio|secuestro|violacion|asalto armado|robo con violencia)/.test(normalized)
     ? 'high'
     : 'medium';
 };
@@ -84,15 +92,38 @@ const buildDescription = (row: Record<string, string>): string => {
   return parts.join(' | ');
 };
 
+const padHora = (hora: string): string => {
+  // Normalize values like "0", "1:30", "23:00" to "HH:MM" two-digit format.
+  const parts = hora.split(':');
+  const hh = parts[0].padStart(2, '0');
+  const mm = (parts[1] ?? '00').padStart(2, '0');
+  return `${hh}:${mm}`;
+};
+
 const parseIncidentTimestamp = (fecha: string, hora: string): number => {
   if (!fecha) {
-    return Date.now();
+    // No date at all — shouldn't happen, but safe fallback to epoch 0
+    // so it never accidentally shows as "recent".
+    return 0;
   }
 
-  const safeHour = hora && hora !== 'N.D.' ? hora : '12:00';
-  const timestamp = Date.parse(`${fecha}T${safeHour}:00`);
+  // Try with provided time first, then fall back to noon on that date.
+  const candidates: string[] = [];
 
-  return Number.isNaN(timestamp) ? Date.now() : timestamp;
+  if (hora && hora !== 'N.D.' && hora.trim() !== '') {
+    candidates.push(`${fecha}T${padHora(hora.trim())}:00`);
+  }
+  candidates.push(`${fecha}T12:00:00`);
+
+  for (const candidate of candidates) {
+    const ts = Date.parse(candidate);
+    if (!Number.isNaN(ts)) {
+      return ts;
+    }
+  }
+
+  // fecha itself is unparseable — return 0 so it is never treated as recent.
+  return 0;
 };
 
 const filterByMostRecentMonth = (incidents: Incident[]): Incident[] => {

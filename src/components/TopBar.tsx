@@ -8,14 +8,18 @@ import { Shield, Sun, Moon, Wallet } from 'lucide-react';
 import { useTheme } from '../contexts/ThemeContext';
 import { useWallet } from '../contexts/WalletContext';
 import { motion, AnimatePresence } from 'motion/react';
+import { Language, uiText } from '../i18n';
 
 interface TopBarProps {
   onConnectClick: () => void;
+  language: Language;
+  onLanguageToggle: () => void;
 }
 
-export default function TopBar({ onConnectClick }: TopBarProps) {
+export default function TopBar({ onConnectClick, language, onLanguageToggle }: TopBarProps) {
   const { theme, toggleTheme } = useTheme();
   const { wallet, disconnect, isLoading } = useWallet();
+  const copy = uiText[language];
 
   return (
     <div className="fixed top-6 left-6 right-6 z-50 h-16 pointer-events-none">
@@ -28,10 +32,19 @@ export default function TopBar({ onConnectClick }: TopBarProps) {
           <div className="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center text-white">
             <Shield size={22} fill="currentColor" />
           </div>
-          <span className="font-black text-xl tracking-tighter text-slate-900 dark:text-white">SENTINEL</span>
+          <span className="font-black text-xl tracking-tighter text-slate-900 dark:text-white">{copy.brand}</span>
         </motion.div>
 
         <div className="flex items-center gap-4">
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={onLanguageToggle}
+            className="h-10 px-3 rounded-lg hover:bg-white/50 text-slate-600 dark:text-slate-300 transition-colors font-bold text-xs"
+          >
+            {copy.languageToggle}
+          </motion.button>
+
           <motion.button
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
@@ -73,7 +86,7 @@ export default function TopBar({ onConnectClick }: TopBarProps) {
               ) : (
                 <motion.div key="connect" className="flex items-center gap-2" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
                   <Wallet size={18} />
-                  <span className="text-sm font-bold">Connect Wallet</span>
+                  <span className="text-sm font-bold">{copy.connectWallet}</span>
                 </motion.div>
               )}
             </AnimatePresence>

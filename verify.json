@@ -1,0 +1,355 @@
+{
+    "chainId":  10143,
+    "contractAddress":  "0x02CB5a9DFeaC92560de4a8C1dc82e5686B130ed6",
+    "contractName":  "contracts/IncidentRegistry.sol:IncidentRegistry",
+    "compilerVersion":  "v0.8.28+commit.7893614a",
+    "standardJsonInput":  {
+                              "language":  "Solidity",
+                              "sources":  {
+                                              "contracts/IncidentRegistry.sol":  {
+                                                                                     "content":  "// SPDX-License-Identifier: MIT\npragma solidity ^0.8.28;\n\ncontract IncidentRegistry {\n    struct Incident {\n        uint256 id;\n        address reporter;\n        string incidentType;\n        string severity;\n        string description;\n        int256 latE6;\n        int256 lngE6;\n        uint256 reportedAt;\n        string sourceLanguage;\n        uint256 confirmations;\n    }\n\n    uint256 public nextIncidentId;\n\n    mapping(uint256 =\u003e Incident) private incidents;\n    mapping(uint256 =\u003e mapping(address =\u003e bool)) public hasConfirmed;\n\n    event IncidentReported(\n        uint256 indexed incidentId,\n        address indexed reporter,\n        string incidentType,\n        string severity,\n        string description,\n        int256 latE6,\n        int256 lngE6,\n        uint256 reportedAt,\n        string sourceLanguage\n    );\n\n    event IncidentConfirmed(uint256 indexed incidentId, address indexed confirmer, uint256 confirmations);\n\n    function reportIncident(\n        string calldata incidentType,\n        string calldata severity,\n        string calldata description,\n        int256 latE6,\n        int256 lngE6,\n        string calldata sourceLanguage\n    ) external returns (uint256 incidentId) {\n        require(bytes(incidentType).length \u003e 0, \"incidentType required\");\n        require(bytes(severity).length \u003e 0, \"severity required\");\n        require(bytes(description).length \u003e 0, \"description required\");\n\n        incidentId = nextIncidentId;\n        nextIncidentId += 1;\n\n        incidents[incidentId] = Incident({\n            id: incidentId,\n            reporter: msg.sender,\n            incidentType: incidentType,\n            severity: severity,\n            description: description,\n            latE6: latE6,\n            lngE6: lngE6,\n            reportedAt: block.timestamp,\n            sourceLanguage: sourceLanguage,\n            confirmations: 0\n        });\n\n        emit IncidentReported(\n            incidentId,\n            msg.sender,\n            incidentType,\n            severity,\n            description,\n            latE6,\n            lngE6,\n            block.timestamp,\n            sourceLanguage\n        );\n    }\n\n    function confirmIncident(uint256 incidentId) external {\n        Incident storage incident = incidents[incidentId];\n        require(incident.reportedAt != 0, \"incident not found\");\n        require(!hasConfirmed[incidentId][msg.sender], \"already confirmed\");\n\n        hasConfirmed[incidentId][msg.sender] = true;\n        incident.confirmations += 1;\n\n        emit IncidentConfirmed(incidentId, msg.sender, incident.confirmations);\n    }\n\n    function getIncident(uint256 incidentId) external view returns (Incident memory) {\n        Incident memory incident = incidents[incidentId];\n        require(incident.reportedAt != 0, \"incident not found\");\n        return incident;\n    }\n}\n"
+                                                                                 }
+                                          },
+                              "settings":  {
+                                               "remappings":  [
+                                                                  "forge-std/=lib/forge-std/src/"
+                                                              ],
+                                               "optimizer":  {
+                                                                 "enabled":  false,
+                                                                 "runs":  200
+                                                             },
+                                               "metadata":  {
+                                                                "useLiteralContent":  false,
+                                                                "bytecodeHash":  "ipfs",
+                                                                "appendCBOR":  true
+                                                            },
+                                               "outputSelection":  {
+                                                                       "*":  {
+                                                                                 "*":  [
+                                                                                           "abi",
+                                                                                           "evm.bytecode.object",
+                                                                                           "evm.bytecode.sourceMap",
+                                                                                           "evm.bytecode.linkReferences",
+                                                                                           "evm.deployedBytecode.object",
+                                                                                           "evm.deployedBytecode.sourceMap",
+                                                                                           "evm.deployedBytecode.linkReferences",
+                                                                                           "evm.deployedBytecode.immutableReferences",
+                                                                                           "evm.methodIdentifiers",
+                                                                                           "metadata"
+                                                                                       ]
+                                                                             }
+                                                                   },
+                                               "evmVersion":  "prague",
+                                               "viaIR":  false,
+                                               "libraries":  {
+
+                                                             }
+                                           }
+                          },
+    "foundryMetadata":  {
+                            "compiler":  {
+                                             "version":  "0.8.28+commit.7893614a"
+                                         },
+                            "language":  "Solidity",
+                            "output":  {
+                                           "abi":  [
+                                                       {
+                                                           "inputs":  [
+                                                                          {
+                                                                              "internalType":  "uint256",
+                                                                              "name":  "incidentId",
+                                                                              "type":  "uint256",
+                                                                              "indexed":  true
+                                                                          },
+                                                                          {
+                                                                              "internalType":  "address",
+                                                                              "name":  "confirmer",
+                                                                              "type":  "address",
+                                                                              "indexed":  true
+                                                                          },
+                                                                          {
+                                                                              "internalType":  "uint256",
+                                                                              "name":  "confirmations",
+                                                                              "type":  "uint256",
+                                                                              "indexed":  false
+                                                                          }
+                                                                      ],
+                                                           "type":  "event",
+                                                           "name":  "IncidentConfirmed",
+                                                           "anonymous":  false
+                                                       },
+                                                       {
+                                                           "inputs":  [
+                                                                          {
+                                                                              "internalType":  "uint256",
+                                                                              "name":  "incidentId",
+                                                                              "type":  "uint256",
+                                                                              "indexed":  true
+                                                                          },
+                                                                          {
+                                                                              "internalType":  "address",
+                                                                              "name":  "reporter",
+                                                                              "type":  "address",
+                                                                              "indexed":  true
+                                                                          },
+                                                                          {
+                                                                              "internalType":  "string",
+                                                                              "name":  "incidentType",
+                                                                              "type":  "string",
+                                                                              "indexed":  false
+                                                                          },
+                                                                          {
+                                                                              "internalType":  "string",
+                                                                              "name":  "severity",
+                                                                              "type":  "string",
+                                                                              "indexed":  false
+                                                                          },
+                                                                          {
+                                                                              "internalType":  "string",
+                                                                              "name":  "description",
+                                                                              "type":  "string",
+                                                                              "indexed":  false
+                                                                          },
+                                                                          {
+                                                                              "internalType":  "int256",
+                                                                              "name":  "latE6",
+                                                                              "type":  "int256",
+                                                                              "indexed":  false
+                                                                          },
+                                                                          {
+                                                                              "internalType":  "int256",
+                                                                              "name":  "lngE6",
+                                                                              "type":  "int256",
+                                                                              "indexed":  false
+                                                                          },
+                                                                          {
+                                                                              "internalType":  "uint256",
+                                                                              "name":  "reportedAt",
+                                                                              "type":  "uint256",
+                                                                              "indexed":  false
+                                                                          },
+                                                                          {
+                                                                              "internalType":  "string",
+                                                                              "name":  "sourceLanguage",
+                                                                              "type":  "string",
+                                                                              "indexed":  false
+                                                                          }
+                                                                      ],
+                                                           "type":  "event",
+                                                           "name":  "IncidentReported",
+                                                           "anonymous":  false
+                                                       },
+                                                       {
+                                                           "inputs":  [
+                                                                          {
+                                                                              "internalType":  "uint256",
+                                                                              "name":  "incidentId",
+                                                                              "type":  "uint256"
+                                                                          }
+                                                                      ],
+                                                           "stateMutability":  "nonpayable",
+                                                           "type":  "function",
+                                                           "name":  "confirmIncident"
+                                                       },
+                                                       {
+                                                           "inputs":  [
+                                                                          {
+                                                                              "internalType":  "uint256",
+                                                                              "name":  "incidentId",
+                                                                              "type":  "uint256"
+                                                                          }
+                                                                      ],
+                                                           "stateMutability":  "view",
+                                                           "type":  "function",
+                                                           "name":  "getIncident",
+                                                           "outputs":  [
+                                                                           {
+                                                                               "internalType":  "struct IncidentRegistry.Incident",
+                                                                               "name":  "",
+                                                                               "type":  "tuple",
+                                                                               "components":  [
+                                                                                                  {
+                                                                                                      "internalType":  "uint256",
+                                                                                                      "name":  "id",
+                                                                                                      "type":  "uint256"
+                                                                                                  },
+                                                                                                  {
+                                                                                                      "internalType":  "address",
+                                                                                                      "name":  "reporter",
+                                                                                                      "type":  "address"
+                                                                                                  },
+                                                                                                  {
+                                                                                                      "internalType":  "string",
+                                                                                                      "name":  "incidentType",
+                                                                                                      "type":  "string"
+                                                                                                  },
+                                                                                                  {
+                                                                                                      "internalType":  "string",
+                                                                                                      "name":  "severity",
+                                                                                                      "type":  "string"
+                                                                                                  },
+                                                                                                  {
+                                                                                                      "internalType":  "string",
+                                                                                                      "name":  "description",
+                                                                                                      "type":  "string"
+                                                                                                  },
+                                                                                                  {
+                                                                                                      "internalType":  "int256",
+                                                                                                      "name":  "latE6",
+                                                                                                      "type":  "int256"
+                                                                                                  },
+                                                                                                  {
+                                                                                                      "internalType":  "int256",
+                                                                                                      "name":  "lngE6",
+                                                                                                      "type":  "int256"
+                                                                                                  },
+                                                                                                  {
+                                                                                                      "internalType":  "uint256",
+                                                                                                      "name":  "reportedAt",
+                                                                                                      "type":  "uint256"
+                                                                                                  },
+                                                                                                  {
+                                                                                                      "internalType":  "string",
+                                                                                                      "name":  "sourceLanguage",
+                                                                                                      "type":  "string"
+                                                                                                  },
+                                                                                                  {
+                                                                                                      "internalType":  "uint256",
+                                                                                                      "name":  "confirmations",
+                                                                                                      "type":  "uint256"
+                                                                                                  }
+                                                                                              ]
+                                                                           }
+                                                                       ]
+                                                       },
+                                                       {
+                                                           "inputs":  [
+                                                                          {
+                                                                              "internalType":  "uint256",
+                                                                              "name":  "",
+                                                                              "type":  "uint256"
+                                                                          },
+                                                                          {
+                                                                              "internalType":  "address",
+                                                                              "name":  "",
+                                                                              "type":  "address"
+                                                                          }
+                                                                      ],
+                                                           "stateMutability":  "view",
+                                                           "type":  "function",
+                                                           "name":  "hasConfirmed",
+                                                           "outputs":  [
+                                                                           {
+                                                                               "internalType":  "bool",
+                                                                               "name":  "",
+                                                                               "type":  "bool"
+                                                                           }
+                                                                       ]
+                                                       },
+                                                       {
+                                                           "inputs":  [
+
+                                                                      ],
+                                                           "stateMutability":  "view",
+                                                           "type":  "function",
+                                                           "name":  "nextIncidentId",
+                                                           "outputs":  [
+                                                                           {
+                                                                               "internalType":  "uint256",
+                                                                               "name":  "",
+                                                                               "type":  "uint256"
+                                                                           }
+                                                                       ]
+                                                       },
+                                                       {
+                                                           "inputs":  [
+                                                                          {
+                                                                              "internalType":  "string",
+                                                                              "name":  "incidentType",
+                                                                              "type":  "string"
+                                                                          },
+                                                                          {
+                                                                              "internalType":  "string",
+                                                                              "name":  "severity",
+                                                                              "type":  "string"
+                                                                          },
+                                                                          {
+                                                                              "internalType":  "string",
+                                                                              "name":  "description",
+                                                                              "type":  "string"
+                                                                          },
+                                                                          {
+                                                                              "internalType":  "int256",
+                                                                              "name":  "latE6",
+                                                                              "type":  "int256"
+                                                                          },
+                                                                          {
+                                                                              "internalType":  "int256",
+                                                                              "name":  "lngE6",
+                                                                              "type":  "int256"
+                                                                          },
+                                                                          {
+                                                                              "internalType":  "string",
+                                                                              "name":  "sourceLanguage",
+                                                                              "type":  "string"
+                                                                          }
+                                                                      ],
+                                                           "stateMutability":  "nonpayable",
+                                                           "type":  "function",
+                                                           "name":  "reportIncident",
+                                                           "outputs":  [
+                                                                           {
+                                                                               "internalType":  "uint256",
+                                                                               "name":  "incidentId",
+                                                                               "type":  "uint256"
+                                                                           }
+                                                                       ]
+                                                       }
+                                                   ],
+                                           "devdoc":  {
+                                                          "kind":  "dev",
+                                                          "methods":  {
+
+                                                                      },
+                                                          "version":  1
+                                                      },
+                                           "userdoc":  {
+                                                           "kind":  "user",
+                                                           "methods":  {
+
+                                                                       },
+                                                           "version":  1
+                                                       }
+                                       },
+                            "settings":  {
+                                             "remappings":  [
+                                                                "forge-std/=lib/forge-std/src/"
+                                                            ],
+                                             "optimizer":  {
+                                                               "enabled":  false,
+                                                               "runs":  200
+                                                           },
+                                             "metadata":  {
+                                                              "bytecodeHash":  "ipfs"
+                                                          },
+                                             "compilationTarget":  {
+                                                                       "contracts/IncidentRegistry.sol":  "IncidentRegistry"
+                                                                   },
+                                             "evmVersion":  "prague",
+                                             "libraries":  {
+
+                                                           }
+                                         },
+                            "sources":  {
+                                            "contracts/IncidentRegistry.sol":  {
+                                                                                   "keccak256":  "0x8078398df0a2dcefa4f01cbf39bde902a778696589b4a44b991331343553a6ae",
+                                                                                   "urls":  [
+                                                                                                "bzz-raw://d49ff3d4cf978b7cc35b40d5cf7280e8744fa2ee246cba2f2d01aafe5abe6186",
+                                                                                                "dweb:/ipfs/Qmbj2sWR12hUhJnsUSSXc331gwmkz9jbH3UQKKSwk4LdAM"
+                                                                                            ],
+                                                                                   "license":  "MIT"
+                                                                               }
+                                        },
+                            "version":  1
+                        }
+}

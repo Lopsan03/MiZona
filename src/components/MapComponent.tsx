@@ -4,10 +4,10 @@
  */
 
 import React, { useState } from 'react';
-import { MapContainer, TileLayer, Marker, Circle } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Circle, Polyline } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { Incident } from '../types';
+import { Incident, SafeRoutePlan } from '../types';
 
 // Fix Leaflet icons issues in Vite
 // We use custom icons for everything, so we can just reset the default icon to something safe or ignore it
@@ -24,6 +24,7 @@ interface MapComponentProps {
   onIncidentClick: (incident: Incident) => void;
   userLocation: [number, number] | null;
   defaultCenter: [number, number];
+  routePlan: SafeRoutePlan | null;
 }
 
 const IncidentMarker = ({ incident, onClick }: { incident: Incident, onClick: () => void, key?: string }) => {
@@ -71,7 +72,7 @@ const IncidentMarker = ({ incident, onClick }: { incident: Incident, onClick: ()
   );
 };
 
-export default function MapComponent({ incidents, onIncidentClick, userLocation, defaultCenter }: MapComponentProps) {
+export default function MapComponent({ incidents, onIncidentClick, userLocation, defaultCenter, routePlan }: MapComponentProps) {
   const [center] = useState<[number, number]>(defaultCenter);
 
   const userIcon = L.divIcon({
@@ -106,6 +107,36 @@ export default function MapComponent({ incidents, onIncidentClick, userLocation,
             onClick={() => onIncidentClick(incident)}
           />
         ))}
+
+        {routePlan?.routes.map((route) => {
+          const isSelected = route.id === routePlan.selectedRouteId;
+
+          return (
+            <Polyline
+              key={route.id}
+              positions={route.geometry}
+              pathOptions={{
+                color: isSelected ? '#10b981' : '#94a3b8',
+                weight: isSelected ? 6 : 4,
+                opacity: isSelected ? 0.95 : 0.4,
+                dashArray: isSelected ? undefined : '8 8',
+              }}
+            />
+          );
+        })}
+
+        {routePlan && (
+          <Circle
+            center={routePlan.destination}
+            radius={45}
+            pathOptions={{
+              color: '#10b981',
+              fillColor: '#10b981',
+              fillOpacity: 0.35,
+              weight: 2,
+            }}
+          />
+        )}
       </MapContainer>
     </div>
   );

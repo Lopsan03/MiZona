@@ -12,38 +12,44 @@ import {
   ShieldCheck, 
   AlertTriangle, 
   Eye, 
-  Ghost, 
   Zap, 
   MoreHorizontal,
+  Siren,
+  ShieldAlert,
+  Pill,
   Wallet,
-  CheckCircle2
 } from 'lucide-react';
 import { Incident, IncidentType } from '../types';
 import { useWallet } from '../contexts/WalletContext';
+import { categoryLabels, Language, uiText } from '../i18n';
 
 interface IncidentPanelProps {
   incident: Incident | null;
   onClose: () => void;
   onConfirm: (id: string) => void;
+  language: Language;
 }
 
 const IconMap: Record<IncidentType, React.ReactNode> = {
   robbery: <Zap size={18} />,
-  weapon: <AlertTriangle size={18} />,
-  suspicious: <Eye size={18} />,
-  lighting: <Ghost size={18} />,
+  assault: <AlertTriangle size={18} />,
+  homicide: <Siren size={18} />,
+  kidnapping: <ShieldAlert size={18} />,
+  sexualCrime: <Eye size={18} />,
+  drugActivity: <Pill size={18} />,
   other: <MoreHorizontal size={18} />
 };
 
-export default function IncidentPanel({ incident, onClose, onConfirm }: IncidentPanelProps) {
+export default function IncidentPanel({ incident, onClose, onConfirm, language }: IncidentPanelProps) {
   const { wallet } = useWallet();
+  const copy = uiText[language];
 
   const getTimeAgo = (timestamp: number) => {
     const seconds = Math.floor((Date.now() - timestamp) / 1000);
-    if (seconds < 60) return 'Just now';
+    if (seconds < 60) return copy.justNow;
     const minutes = Math.floor(seconds / 60);
-    if (minutes < 60) return `${minutes}m ago`;
-    return `${Math.floor(minutes / 60)}h ago`;
+    if (minutes < 60) return `${minutes}${copy.agoM}`;
+    return `${Math.floor(minutes / 60)}${copy.agoH}`;
   };
 
   return (
@@ -77,7 +83,7 @@ export default function IncidentPanel({ incident, onClose, onConfirm }: Incident
                     </div>
                     <span className="text-slate-400 text-xs font-medium">{getTimeAgo(incident.timestamp)}</span>
                   </div>
-                  <h3 className="text-2xl font-bold capitalize leading-tight text-slate-900 dark:text-white">{incident.type}</h3>
+                  <h3 className="text-2xl font-bold leading-tight text-slate-900 dark:text-white">{categoryLabels[language][incident.type].long}</h3>
                 </div>
                 <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${
                   incident.severity === 'high' ? 'bg-red-50 text-red-500' : 'bg-amber-50 text-amber-500'
@@ -92,16 +98,16 @@ export default function IncidentPanel({ incident, onClose, onConfirm }: Incident
 
               <div className="grid grid-cols-2 gap-3 mb-6">
                 <div className="bg-slate-50/50 dark:bg-slate-800/50 rounded-xl p-3 border border-slate-100 dark:border-slate-700">
-                  <div className="text-[10px] text-slate-400 uppercase font-bold mb-1 tracking-wider text-left">Reporter Status</div>
+                  <div className="text-[10px] text-slate-400 uppercase font-bold mb-1 tracking-wider text-left">{copy.reporterStatus}</div>
                   <div className="flex items-center gap-2">
                     <span className="text-sm font-bold text-slate-800 dark:text-slate-200">{incident.reporter.reputation} Points</span>
-                    <span className="text-green-500 text-[10px] font-bold">High Trust</span>
+                    <span className="text-green-500 text-[10px] font-bold">{copy.highTrust}</span>
                   </div>
                 </div>
                 <div className="bg-slate-50/50 dark:bg-slate-800/50 rounded-xl p-3 border border-slate-100 dark:border-slate-700">
-                  <div className="text-[10px] text-slate-400 uppercase font-bold mb-1 tracking-wider text-left">Confidence</div>
+                  <div className="text-[10px] text-slate-400 uppercase font-bold mb-1 tracking-wider text-left">{copy.confidence}</div>
                   <div className="flex items-center gap-2 text-left">
-                    <span className="text-sm font-bold text-slate-800 dark:text-slate-200">{incident.confirmations} Confirmations</span>
+                    <span className="text-sm font-bold text-slate-800 dark:text-slate-200">{incident.confirmations} {copy.confirmations}</span>
                   </div>
                 </div>
               </div>
@@ -114,7 +120,7 @@ export default function IncidentPanel({ incident, onClose, onConfirm }: Incident
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-mono font-medium text-slate-500">{incident.reporter.address}</span>
                   </div>
-                  <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wide">Validated Identity</span>
+                  <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wide">{copy.validatedIdentity}</span>
                 </div>
               </div>
 
@@ -132,12 +138,12 @@ export default function IncidentPanel({ incident, onClose, onConfirm }: Incident
                 {wallet.isConnected ? (
                   <>
                     <ShieldCheck size={20} />
-                    CONFIRM INCIDENT
+                    {copy.confirmIncident}
                   </>
                 ) : (
                   <>
                     <Wallet size={18} />
-                    CONNECT WALLET TO INTERACT
+                    {copy.connectToInteract}
                   </>
                 )}
               </motion.button>

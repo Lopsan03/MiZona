@@ -7,15 +7,18 @@ import React from 'react';
 import { Radio, Plus } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useWallet } from '../contexts/WalletContext';
+import { Language, uiText } from '../i18n';
 
 interface FloatingUIProps {
   count: number;
   onReportClick: () => void;
   onConnectClick: () => void;
+  language: Language;
 }
 
-export default function FloatingUI({ count, onReportClick, onConnectClick }: FloatingUIProps) {
+export default function FloatingUI({ count, onReportClick, onConnectClick, language }: FloatingUIProps) {
   const { wallet } = useWallet();
+  const copy = uiText[language];
 
   return (
     <div className="fixed inset-0 z-40 pointer-events-none p-8">
@@ -27,7 +30,7 @@ export default function FloatingUI({ count, onReportClick, onConnectClick }: Flo
         >
           <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
           <span className="text-sm font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
-            {count} Active Incidents Nearby
+            {count} {copy.activeIncidentsNearby}
           </span>
         </motion.div>
       </div>
@@ -44,12 +47,12 @@ export default function FloatingUI({ count, onReportClick, onConnectClick }: Flo
               <div className="w-10 h-10 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-3">
                 <Radio size={18} className="text-slate-500" />
               </div>
-              <p className="text-xs font-semibold mb-4 text-slate-600 dark:text-slate-400">Connect wallet to report or validate local incidents.</p>
+              <p className="text-xs font-semibold mb-4 text-slate-600 dark:text-slate-400">{copy.connectWalletHint}</p>
               <button 
                 onClick={onConnectClick}
                 className="w-full py-2.5 bg-slate-900 text-white text-xs font-bold rounded-xl hover:bg-slate-800 transition-colors shadow-lg shadow-slate-900/10"
               >
-                Connect Now
+                {copy.connectNow}
               </button>
             </motion.div>
           )}

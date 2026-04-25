@@ -28,7 +28,7 @@ export const MOCK_INCIDENTS: Incident[] = [
   },
   {
     id: '2',
-    type: 'weapon',
+    type: 'assault',
     severity: 'high',
     confidence: 'pending',
     description: 'Argument involving a sharp object. Police en route.',
@@ -41,7 +41,7 @@ export const MOCK_INCIDENTS: Incident[] = [
   },
   {
     id: '3',
-    type: 'suspicious',
+    type: 'drugActivity',
     severity: 'medium',
     confidence: 'confirmed',
     description: 'Multiple individuals checking car door handles.',
@@ -54,7 +54,7 @@ export const MOCK_INCIDENTS: Incident[] = [
   },
   {
     id: '4',
-    type: 'lighting',
+    type: 'kidnapping',
     severity: 'medium',
     confidence: 'confirmed',
     description: 'Street lights out for two blocks. Very low visibility.',
@@ -93,7 +93,7 @@ export const MOCK_INCIDENTS: Incident[] = [
   },
   {
     id: '7',
-    type: 'suspicious',
+    type: 'sexualCrime',
     severity: 'medium',
     confidence: 'pending',
     description: 'Unattended bag left near park entrance.',
@@ -106,7 +106,7 @@ export const MOCK_INCIDENTS: Incident[] = [
   },
   {
     id: '8',
-    type: 'weapon',
+    type: 'homicide',
     severity: 'high',
     confidence: 'confirmed',
     description: 'Shots reported in the alleyway.',
@@ -120,7 +120,7 @@ export const MOCK_INCIDENTS: Incident[] = [
 ];
 
 export const generateRandomIncident = (): Incident => {
-  const types: IncidentType[] = ['robbery', 'weapon', 'suspicious', 'lighting', 'other'];
+  const types: IncidentType[] = ['robbery', 'assault', 'homicide', 'kidnapping', 'sexualCrime', 'drugActivity', 'other'];
   const severities: Severity[] = ['high', 'medium'];
   const baseLat = 40.75;
   const baseLng = -73.98;

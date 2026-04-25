@@ -23,9 +23,15 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
 export function useWallet(): WalletContextType {
   const { ready, authenticated, user, login, logout } = usePrivy();
 
+  // Resolve address from wallet or any linked wallet account.
+  const address =
+    user?.wallet?.address ??
+    (user?.linkedAccounts?.find((a) => a.type === 'wallet') as any)?.address ??
+    null;
+
   const wallet: WalletState = {
     isConnected: authenticated,
-    address: user?.wallet?.address ?? null,
+    address,
     reputation: 42,
   };
 
