@@ -83,7 +83,7 @@ export default function LandingPage({ onEnterApp }: LandingPageProps) {
                 La calle que vas a tomar... ya fue reportada?
               </h1>
               <p className="mt-6 max-w-2xl text-base leading-relaxed text-slate-200 sm:text-lg">
-                Mi Zona es un mapa en tiempo real donde la gente reporta asaltos de forma anonima. Para que llegues a casa.
+                Mi Zona es un mapa en tiempo real donde la gente reporta incidentes de forma anonima. Para que llegues a casa.
               </p>
               <div className="mt-8 flex flex-wrap gap-3">
                 <button
