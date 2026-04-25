@@ -1,0 +1,125 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-border: var(--border);
+  --color-ring: var(--ring);
+
+  --color-slate-50: #f8fafc;
+  --color-slate-100: #f1f5f9;
+  --color-slate-200: #e2e8f0;
+  --color-slate-300: #cbd5e1;
+  --color-slate-400: #94a3b8;
+  --color-slate-500: #64748b;
+  --color-slate-600: #475569;
+  --color-slate-700: #334155;
+  --color-slate-800: #1e293b;
+  --color-slate-900: #0f172a;
+
+  --color-severity-high: #ef4444;
+  --color-severity-medium: #f59e0b;
+}
+
+@layer base {
+  :root {
+    --background: #F4F4F5;
+    --foreground: #0f172a;
+    --card: rgba(255, 255, 255, 0.75);
+    --card-foreground: #0f172a;
+    --border: rgba(255, 255, 255, 0.35);
+    --ring: #0f172a;
+  }
+
+  .dark {
+    --background: #09090b;
+    --foreground: #f8fafc;
+    --card: rgba(15, 23, 42, 0.7);
+    --card-foreground: #f8fafc;
+    --border: rgba(255, 255, 255, 0.1);
+    --ring: #f8fafc;
+  }
+}
+
+@layer components {
+  .glass-card {
+    @apply bg-card backdrop-blur-[20px] border border-border shadow-[0_8px_32px_0_rgba(0,0,0,0.08)];
+  }
+
+  .map-grid {
+    background-image: 
+      linear-gradient(#e5e7eb 1px, transparent 1px),
+      linear-gradient(90deg, #e5e7eb 1px, transparent 1px);
+    background-size: 60px 60px;
+    @apply opacity-40;
+  }
+}
+
+/* Map specific dark mode filters */
+.dark .leaflet-tile-pane {
+  filter: brightness(0.7) contrast(1.2) saturate(0.3) hue-rotate(180deg) invert(1);
+}
+
+.leaflet-container {
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  background: var(--background) !important;
+}
+
+body {
+  @apply font-sans bg-background text-foreground overflow-hidden;
+  height: 100vh;
+  width: 100vw;
+}
+
+/* Pulse animation for markers */
+@keyframes pulse-ring {
+  0% { transform: scale(0.33); }
+  80%, 100% { opacity: 0; }
+}
+
+.user-location-dot {
+  position: relative;
+  width: 12px;
+  height: 12px;
+  @apply bg-blue-500 border-4 border-white shadow-xl rounded-full;
+}
+
+.user-location-dot::before {
+  content: '';
+  position: absolute;
+  top: -8px;
+  left: -8px;
+  width: 28px;
+  height: 28px;
+  @apply border-2 border-blue-500/30 rounded-full animate-pulse;
+}
+
+.danger-zone-circle {
+  transition: all 0.3s ease;
+}
+
+.marker-pulse {
+  animation: marker-pulse-anim 2s infinite;
+}
+
+@keyframes marker-pulse-anim {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+  }
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
+  }
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+  }
+}

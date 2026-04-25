@@ -1,0 +1,8 @@
+{
+  "name": "Sentinel",
+  "description": "A real-time community safety platform for reporting and tracking local safety incidents using map-centric visualization and wallet-based identity.",
+  "requestFramePermissions": [
+    "geolocation"
+  ],
+  "majorCapabilities": []
+}
