@@ -71,6 +71,8 @@ export interface PublishIncidentInput {
   lat: number;
   lng: number;
   language: Language;
+  reporterAddress: Address;
+  ethereumProvider: NonNullable<typeof window.ethereum>;
 }
 
 export const MONAD_INCIDENT_REGISTRY_ADDRESS = import.meta.env.VITE_INCIDENT_REGISTRY_ADDRESS as Address | undefined;
@@ -109,41 +111,48 @@ export const publishIncidentToMonad = async (input: PublishIncidentInput): Promi
     return null;
   }
 
-  const backendUrl = (import.meta.env.VITE_BACKEND_URL || '/api').replace(/\/$/, '');
-  
   try {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 150000); // 2.5 minute timeout
-    
-    const response = await fetch(`${backendUrl}/incidents/report`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        type: input.type,
-        severity: input.severity,
-        description: input.description,
-        lat: input.lat,
-        lng: input.lng,
-        language: input.language,
-      }),
-      signal: controller.signal,
+    await ensureMonadTestnet(input.ethereumProvider);
+
+    const walletClient = createWalletClient({
+      account: input.reporterAddress,
+      chain: monadTestnet,
+      transport: custom(input.ethereumProvider),
     });
 
-    clearTimeout(timeoutId);
+    const publicClient = createPublicClient({
+      chain: monadTestnet,
+      transport: http(monadTestnet.rpcUrls.default.http[0]),
+    });
 
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error || 'Backend service error');
-    }
+    const { request } = await publicClient.simulateContract({
+      account: input.reporterAddress,
+      address: MONAD_INCIDENT_REGISTRY_ADDRESS,
+      abi: INCIDENT_REGISTRY_ABI,
+      functionName: 'reportIncident',
+      args: [
+        input.type,
+        input.severity,
+        input.description,
+        toScaledCoordinate(input.lat),
+        toScaledCoordinate(input.lng),
+        input.language,
+      ],
+    });
 
-    const result = await response.json();
-    return result.transactionHash || null;
+    const hash = await walletClient.writeContract(request);
+
+    await Promise.race([
+      publicClient.waitForTransactionReceipt({ hash }),
+      new Promise<never>((_, reject) => {
+        setTimeout(() => {
+          reject(new Error('Transaction confirmation timeout. Your wallet submitted the transaction, but Monad took too long to confirm it.'));
+        }, 120000);
+      }),
+    ]);
+
+    return hash;
   } catch (error) {
-    if (error instanceof Error && error.name === 'AbortError') {
-      throw new Error('Report submission timed out. Please try again or check your internet connection.');
-    }
     const message = error instanceof Error ? error.message : 'Failed to submit report';
     throw new Error(message);
   }

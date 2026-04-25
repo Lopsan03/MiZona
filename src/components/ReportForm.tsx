@@ -230,7 +230,7 @@ export default function ReportForm({ isOpen, onClose, onSubmit, onConnectClick, 
                   <motion.div key="loading" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="py-20 text-center">
                     <Loader2 size={48} className="mx-auto mb-6 text-slate-400 animate-spin" />
                     <h3 className="text-xl font-bold mb-2">{copy.publishingToMonad}</h3>
-                    <p className="text-slate-400 text-sm">Processing your report on the blockchain...</p>
+                    <p className="text-slate-400 text-sm">{copy.publishingWalletPrompt}</p>
                   </motion.div>
                 ) : (
                   <motion.div key="success" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="py-20 text-center">

@@ -26,7 +26,7 @@ interface AppContentProps {
 }
 
 function AppContent({ onBackToLanding }: AppContentProps) {
-  const { wallet, connect } = useWallet();
+  const { wallet, connect, getEthereumProvider } = useWallet();
   const [incidents, setIncidents] = useState<Incident[]>(CSV_INCIDENTS);
   const [userLocation, setUserLocation] = useState<[number, number] | null>(null);
   const [locationReady, setLocationReady] = useState(false);
@@ -129,6 +129,16 @@ function AppContent({ onBackToLanding }: AppContentProps) {
     const lat = userLocation ? userLocation[0] : GUADALAJARA_CENTER[0];
     const lng = userLocation ? userLocation[1] : GUADALAJARA_CENTER[1];
 
+    if (!wallet.address) {
+      throw new Error('Connect a wallet before reporting an incident.');
+    }
+
+    const ethereumProvider = await getEthereumProvider();
+
+    if (!ethereumProvider) {
+      throw new Error('No wallet provider is available for signing. Reconnect your wallet and try again.');
+    }
+
     await publishIncidentToMonad({
       type: data.type,
       severity: data.severity,
@@ -136,6 +146,8 @@ function AppContent({ onBackToLanding }: AppContentProps) {
       lat,
       lng,
       language,
+      reporterAddress: wallet.address as `0x${string}`,
+      ethereumProvider,
     });
 
     const newIncident: Incident = {

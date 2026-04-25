@@ -192,6 +192,81 @@ export default function LandingPage({ onEnterApp }: LandingPageProps) {
         </p>
       </section>
 
+      <section className="mx-auto w-full max-w-6xl px-5 py-20 sm:px-8 md:px-10">
+        <p className="text-xs font-semibold tracking-[0.2em] text-violet-300">MODELO DE NEGOCIO</p>
+        <h2 className="font-hero mt-2 text-4xl uppercase leading-none text-white sm:text-5xl">
+          Gratis para las personas.{' '}
+          <span className="text-violet-300">Valioso para el mundo.</span>
+        </h2>
+        <p className="mt-6 text-base leading-relaxed text-slate-200">
+          Mi Zona es gratis para ciudadanos.
+        </p>
+        <p className="mt-2 text-base text-slate-400">Pero nuestra data puede ayudar a:</p>
+
+        <div className="mt-8 grid gap-4 md:grid-cols-3">
+          <article className="rounded-3xl border border-violet-400/25 bg-violet-400/8 p-6">
+            <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-violet-400/20 text-xl">🚚</div>
+            <h3 className="font-hero text-xl uppercase text-violet-300">Logística</h3>
+            <p className="mt-2 text-sm leading-relaxed text-slate-200">
+              Optimizar rutas seguras para empresas de logística.
+            </p>
+          </article>
+          <article className="rounded-3xl border border-violet-400/25 bg-violet-400/8 p-6">
+            <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-violet-400/20 text-xl">🛡️</div>
+            <h3 className="font-hero text-xl uppercase text-violet-300">Aseguradoras</h3>
+            <p className="mt-2 text-sm leading-relaxed text-slate-200">
+              Reducir riesgos para aseguradoras con datos de incidentes en tiempo real.
+            </p>
+          </article>
+          <article className="rounded-3xl border border-violet-400/25 bg-violet-400/8 p-6">
+            <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-violet-400/20 text-xl">🏙️</div>
+            <h3 className="font-hero text-xl uppercase text-violet-300">Inmobiliario</h3>
+            <p className="mt-2 text-sm leading-relaxed text-slate-200">
+              Evaluar zonas para desarrollos inmobiliarios con información real.
+            </p>
+          </article>
+        </div>
+
+        <div className="mt-10 rounded-3xl border border-violet-400/30 bg-gradient-to-r from-violet-500/15 via-purple-500/10 to-violet-500/15 px-8 py-6 text-center">
+          <p className="font-hero text-2xl uppercase text-white sm:text-3xl">
+            Convertimos datos ciudadanos en{' '}
+            <span className="text-violet-300">decisiones inteligentes.</span>
+          </p>
+        </div>
+      </section>
+
+      <section className="bg-gradient-to-br from-sky-500/10 via-transparent to-emerald-500/10">
+        <div className="mx-auto w-full max-w-6xl px-5 py-20 sm:px-8 md:px-10">
+          <p className="text-xs font-semibold tracking-[0.2em] text-sky-300">PROYECCIÓN</p>
+          <h2 className="font-hero mt-2 text-4xl uppercase leading-none text-white sm:text-6xl">
+            Esto apenas{' '}
+            <span className="text-emerald-300">empieza.</span>
+          </h2>
+          <p className="mt-6 max-w-2xl text-base leading-relaxed text-slate-200">
+            Estamos construyendo Mi Zona para escalar a nivel nacional.
+          </p>
+
+          <p className="mt-6 text-sm font-semibold tracking-widest text-slate-400 uppercase">Aplicando a iniciativas como:</p>
+          <div className="mt-4 flex flex-wrap gap-3">
+            <span className="rounded-full border border-emerald-400/40 bg-emerald-400/10 px-5 py-2 text-sm font-bold text-emerald-300 tracking-wide">
+              PosibleMTY
+            </span>
+            <span className="rounded-full border border-sky-400/40 bg-sky-400/10 px-5 py-2 text-sm font-bold text-sky-300 tracking-wide">
+              Reto Zapopan
+            </span>
+          </div>
+
+          <div className="mt-12 max-w-3xl">
+            <p className="text-lg leading-relaxed text-slate-200">
+              Porque creemos que esta solución no solo es necesaria…
+            </p>
+            <p className="font-hero mt-2 text-3xl uppercase text-white sm:text-4xl">
+              es inevitable.
+            </p>
+          </div>
+        </div>
+      </section>
+
       <section className="border-t border-white/10 bg-black/30">
         <div className="mx-auto flex max-w-6xl flex-col gap-6 px-5 py-20 sm:px-8 md:px-10">
           <p className="text-xs font-semibold tracking-[0.2em] text-emerald-200">CTA FINAL</p>
