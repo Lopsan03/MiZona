@@ -64,7 +64,16 @@ export default async function handler(request: Request) {
   }
 
   try {
-    const { type, severity, description, lat, lng, language } = (await request.json()) as ReportIncidentRequest;
+    let body: ReportIncidentRequest;
+    
+    try {
+      const text = await request.text();
+      body = JSON.parse(text);
+    } catch {
+      return json({ success: false, error: 'Invalid JSON in request body' }, { status: 400 });
+    }
+
+    const { type, severity, description, lat, lng, language } = body;
 
     if (!type || !severity || !description || typeof lat !== 'number' || typeof lng !== 'number' || !language) {
       return json({ success: false, error: 'Missing or invalid required fields' }, { status: 400 });
@@ -73,17 +82,24 @@ export default async function handler(request: Request) {
     const privateKey = process.env.MONAD_PRIVATE_KEY as `0x${string}` | undefined;
     const contractAddress = process.env.VITE_INCIDENT_REGISTRY_ADDRESS as Address | undefined;
 
+    console.log('=== Incident Report Handler ===');
+    console.log('Environment check:');
+    console.log('- MONAD_PRIVATE_KEY:', privateKey ? '✓ Set' : '✗ MISSING');
+    console.log('- VITE_INCIDENT_REGISTRY_ADDRESS:', contractAddress ? `✓ ${contractAddress}` : '✗ MISSING');
+
     if (!privateKey || !contractAddress) {
       const missingVars = [];
       if (!privateKey) missingVars.push('MONAD_PRIVATE_KEY');
       if (!contractAddress) missingVars.push('VITE_INCIDENT_REGISTRY_ADDRESS');
-      console.error('Missing environment variables:', missingVars);
-      return json({ success: false, error: `Server configuration error: Missing ${missingVars.join(', ')}` }, { status: 500 });
+      const errorMsg = `Server configuration error: Missing ${missingVars.join(', ')}`;
+      console.error('ERROR:', errorMsg);
+      return json({ success: false, error: errorMsg }, { status: 500 });
     }
 
-    console.log('Processing incident report:', { type, severity, lat, lng });
-
+    console.log('Creating account from private key...');
     const account = privateKeyToAccount(privateKey);
+    console.log('- Account address:', account.address);
+
     const walletClient = createWalletClient({
       chain: monadTestnet,
       transport: http(monadTestnet.rpcUrls.default.http[0]),
@@ -95,44 +111,60 @@ export default async function handler(request: Request) {
       transport: http(monadTestnet.rpcUrls.default.http[0]),
     });
 
+    console.log('Checking account balance...');
+    const balance = await publicClient.getBalance({ address: account.address });
+    console.log('- Balance:', balance.toString(), 'wei');
+
+    if (balance === BigInt(0)) {
+      const errorMsg = `Account ${account.address} has no balance. Please fund the account.`;
+      console.error('ERROR:', errorMsg);
+      return json({ success: false, error: errorMsg }, { status: 500 });
+    }
+
     console.log('Simulating contract call...');
-    const { request: contractRequest } = await publicClient.simulateContract({
-      account,
-      address: contractAddress,
-      abi: INCIDENT_REGISTRY_ABI,
-      functionName: 'reportIncident',
-      args: [
-        type,
-        severity,
-        description,
-        toScaledCoordinate(lat),
-        toScaledCoordinate(lng),
-        language,
-      ],
-    });
+    try {
+      const { request: contractRequest } = await publicClient.simulateContract({
+        account,
+        address: contractAddress,
+        abi: INCIDENT_REGISTRY_ABI,
+        functionName: 'reportIncident',
+        args: [
+          type,
+          severity,
+          description,
+          toScaledCoordinate(lat),
+          toScaledCoordinate(lng),
+          language,
+        ],
+      });
+      console.log('- Simulation successful');
 
-    console.log('Writing contract...');
-    const hash = await walletClient.writeContract(contractRequest);
-    console.log('Transaction hash:', hash);
-    
-    // Wait for transaction receipt with a 120-second timeout
-    console.log('Waiting for transaction confirmation (max 120 seconds)...');
-    const receipt = await Promise.race([
-      publicClient.waitForTransactionReceipt({ hash }),
-      new Promise<never>((_, reject) => 
-        setTimeout(() => reject(new Error('Transaction confirmation timeout: The transaction was submitted but took too long to confirm. Please check the explorer.')), 120000)
-      )
-    ]);
+      console.log('Writing contract...');
+      const hash = await walletClient.writeContract(contractRequest);
+      console.log('- Transaction hash:', hash);
+      
+      console.log('Waiting for transaction confirmation (max 120 seconds)...');
+      const receipt = await Promise.race([
+        publicClient.waitForTransactionReceipt({ hash }),
+        new Promise<never>((_, reject) => 
+          setTimeout(() => reject(new Error('Transaction confirmation timeout: The transaction was submitted but took too long to confirm. Please check the explorer.')), 120000)
+        )
+      ]);
 
-    console.log('Transaction confirmed:', receipt.transactionHash);
-    return json({
-      success: true,
-      transactionHash: hash,
-      incidentId: `blockchain-${receipt.blockNumber}-${receipt.transactionIndex}`,
-    });
+      console.log('✓ Transaction confirmed:', receipt.transactionHash);
+      return json({
+        success: true,
+        transactionHash: hash,
+        incidentId: `blockchain-${receipt.blockNumber}-${receipt.transactionIndex}`,
+      });
+    } catch (simulationError) {
+      const simMessage = simulationError instanceof Error ? simulationError.message : 'Unknown error';
+      console.error('ERROR during simulation/execution:', simMessage);
+      throw simulationError;
+    }
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown error occurred';
-    console.error('Incident report error:', message, error);
+    console.error('FAILED:', message);
     return json({ success: false, error: message }, { status: 500 });
   }
 }
