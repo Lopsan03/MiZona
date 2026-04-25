@@ -14,11 +14,11 @@ import IncidentPanel from './components/IncidentPanel';
 import ReportForm from './components/ReportForm';
 import WalletModal from './components/WalletModal';
 import { Incident } from './types';
-import { MOCK_INCIDENTS, generateRandomIncident } from './mockData';
+import { CSV_INCIDENTS, GUADALAJARA_CENTER } from './data/incidentsFromCsv';
 
 function AppContent() {
   const { wallet } = useWallet();
-  const [incidents, setIncidents] = useState<Incident[]>(MOCK_INCIDENTS);
+  const [incidents, setIncidents] = useState<Incident[]>(CSV_INCIDENTS);
   const [userLocation, setUserLocation] = useState<[number, number] | null>(null);
   const [selectedIncident, setSelectedIncident] = useState<Incident | null>(null);
   const [isReportOpen, setIsReportOpen] = useState(false);
@@ -26,7 +26,7 @@ function AppContent() {
   
   // Filters
   const [activeType, setActiveType] = useState<FilterType>('all');
-  const [activeTime, setActiveTime] = useState<TimeFilter>('24h');
+  const [activeTime, setActiveTime] = useState<TimeFilter>('all');
 
   // Geolocation
   useEffect(() => {
@@ -37,21 +37,10 @@ function AppContent() {
         },
         (error) => {
           console.error("Geolocation error:", error);
-          // Default to center of NYC mock area
-          setUserLocation([40.75, -73.98]);
+          setUserLocation(null);
         }
       );
     }
-  }, []);
-
-  // Real-time Simulation
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const newIncident = generateRandomIncident();
-      setIncidents(prev => [newIncident, ...prev]);
-    }, 45000); // Every 45 seconds as requested
-
-    return () => clearInterval(interval);
   }, []);
 
   // Filtered Incidents
@@ -63,6 +52,7 @@ function AppContent() {
       
       // Time Filter
       const timeLimit = {
+        'all': Number.POSITIVE_INFINITY,
         '30m': 30 * 60 * 1000,
         '1h': 60 * 60 * 1000,
         '24h': 24 * 60 * 60 * 1000
@@ -81,8 +71,8 @@ function AppContent() {
       severity: data.severity,
       confidence: 'pending',
       description: data.description,
-      lat: userLocation ? userLocation[0] : 40.75,
-      lng: userLocation ? userLocation[1] : -73.98,
+      lat: userLocation ? userLocation[0] : GUADALAJARA_CENTER[0],
+      lng: userLocation ? userLocation[1] : GUADALAJARA_CENTER[1],
       timestamp: Date.now(),
       reporter: {
         address: wallet.address || '0xUNKNOWN',
@@ -114,6 +104,7 @@ function AppContent() {
         incidents={filteredIncidents} 
         onIncidentClick={setSelectedIncident}
         userLocation={userLocation}
+        defaultCenter={GUADALAJARA_CENTER}
       />
 
       <TopBar onConnectClick={() => setIsWalletModalOpen(true)} />

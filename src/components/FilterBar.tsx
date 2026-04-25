@@ -7,7 +7,7 @@ import React from 'react';
 import { motion } from 'motion/react';
 
 export type FilterType = 'all' | 'high' | 'confirmed';
-export type TimeFilter = '30m' | '1h' | '24h';
+export type TimeFilter = 'all' | '30m' | '1h' | '24h';
 
 interface FilterBarProps {
   activeType: FilterType;
@@ -24,13 +24,14 @@ export default function FilterBar({ activeType, setActiveType, activeTime, setAc
   ];
 
   const timeFilters: { id: TimeFilter; label: string }[] = [
+    { id: 'all', label: 'All Time' },
     { id: '1h', label: 'Last 1h' },
     { id: '24h', label: 'Last 24h' },
   ];
 
   return (
-    <div className="fixed top-24 left-6 flex gap-2 z-40 pointer-events-none">
-      <div className="max-w-7xl mx-auto flex items-center gap-2 pointer-events-auto overflow-x-auto pb-1 no-scrollbar">
+    <div className="fixed top-24 left-0 right-0 z-40 pointer-events-none flex justify-center">
+      <div className="flex items-center gap-2 pointer-events-auto overflow-x-auto pb-1 no-scrollbar px-6">
         {typeFilters.map((filter) => (
           <motion.button
             key={filter.id}

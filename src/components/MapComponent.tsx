@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useEffect, useState } from 'react';
-import { MapContainer, TileLayer, Marker, Circle, useMap } from 'react-leaflet';
+import React, { useState } from 'react';
+import { MapContainer, TileLayer, Marker, Circle } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { Incident } from '../types';
@@ -23,16 +23,7 @@ interface MapComponentProps {
   incidents: Incident[];
   onIncidentClick: (incident: Incident) => void;
   userLocation: [number, number] | null;
-}
-
-function MapUpdater({ center }: { center: [number, number] | null }) {
-  const map = useMap();
-  useEffect(() => {
-    if (center) {
-      map.setView(center, map.getZoom());
-    }
-  }, [center, map]);
-  return null;
+  defaultCenter: [number, number];
 }
 
 const IncidentMarker = ({ incident, onClick }: { incident: Incident, onClick: () => void, key?: string }) => {
@@ -80,8 +71,8 @@ const IncidentMarker = ({ incident, onClick }: { incident: Incident, onClick: ()
   );
 };
 
-export default function MapComponent({ incidents, onIncidentClick, userLocation }: MapComponentProps) {
-  const [center] = useState<[number, number]>([40.75, -73.98]);
+export default function MapComponent({ incidents, onIncidentClick, userLocation, defaultCenter }: MapComponentProps) {
+  const [center] = useState<[number, number]>(defaultCenter);
 
   const userIcon = L.divIcon({
     className: 'user-location-marker',
@@ -115,8 +106,6 @@ export default function MapComponent({ incidents, onIncidentClick, userLocation 
             onClick={() => onIncidentClick(incident)}
           />
         ))}
-
-        <MapUpdater center={userLocation} />
       </MapContainer>
     </div>
   );
