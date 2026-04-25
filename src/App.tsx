@@ -13,6 +13,7 @@ import FloatingUI from './components/FloatingUI';
 import IncidentPanel from './components/IncidentPanel';
 import ReportForm from './components/ReportForm';
 import RoutePlanner from './components/RoutePlanner';
+import LandingPage from './components/LandingPage';
 import { PrivyProvider } from '@privy-io/react-auth';
 import { Language, uiText } from './i18n';
 import { publishIncidentToMonad, fetchBlockchainIncidents, convertBlockchainIncidentsToApp } from './blockchain/incidentRegistry';
@@ -20,7 +21,11 @@ import { Incident, SafeRoutePlan } from './types';
 import { CSV_INCIDENTS, GUADALAJARA_CENTER } from './data/incidentsFromCsv';
 import { buildSafeRoutePlan } from './routing/safeRoute';
 
-function AppContent() {
+interface AppContentProps {
+  onBackToLanding: () => void;
+}
+
+function AppContent({ onBackToLanding }: AppContentProps) {
   const { wallet, connect } = useWallet();
   const [incidents, setIncidents] = useState<Incident[]>(CSV_INCIDENTS);
   const [userLocation, setUserLocation] = useState<[number, number] | null>(null);
@@ -209,6 +214,13 @@ function AppContent() {
         language={language}
       />
 
+      <button
+        onClick={onBackToLanding}
+        className="fixed left-4 top-36 z-45 rounded-full border border-slate-300/60 bg-white/85 px-4 py-2 text-xs font-bold uppercase tracking-[0.14em] text-slate-800 shadow-lg backdrop-blur transition hover:bg-white dark:border-slate-700 dark:bg-slate-900/75 dark:text-slate-200 dark:hover:bg-slate-900 sm:left-8 sm:top-[8.75rem]"
+      >
+        Volver al inicio
+      </button>
+
       <IncidentPanel 
         incident={selectedIncident} 
         onClose={() => setSelectedIncident(null)}
@@ -230,6 +242,8 @@ function AppContent() {
 }
 
 export default function App() {
+  const [showLanding, setShowLanding] = useState(true);
+
   return (
     <PrivyProvider
       appId={import.meta.env.VITE_PRIVY_APP_ID}
@@ -243,7 +257,11 @@ export default function App() {
     >
       <ThemeProvider>
         <WalletProvider>
-          <AppContent />
+          {showLanding ? (
+            <LandingPage onEnterApp={() => setShowLanding(false)} />
+          ) : (
+            <AppContent onBackToLanding={() => setShowLanding(true)} />
+          )}
         </WalletProvider>
       </ThemeProvider>
     </PrivyProvider>

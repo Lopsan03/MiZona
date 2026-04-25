@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { Shield, Sun, Moon, Wallet } from 'lucide-react';
+import { Sun, Moon, Wallet } from 'lucide-react';
 import { useTheme } from '../contexts/ThemeContext';
 import { useWallet } from '../contexts/WalletContext';
 import { motion, AnimatePresence } from 'motion/react';
@@ -29,10 +29,11 @@ export default function TopBar({ onConnectClick, language, onLanguageToggle }: T
           animate={{ opacity: 1, x: 0 }}
           className="flex items-center gap-3"
         >
-          <div className="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center text-white">
-            <Shield size={22} fill="currentColor" />
+          <div className="relative w-10 h-10 rounded-xl flex items-center justify-center bg-red-50 dark:bg-red-900/20">
+            <span className="absolute inline-flex h-5 w-5 rounded-full bg-red-500/40 animate-ping" />
+            <span className="relative inline-flex h-3 w-3 rounded-full bg-red-500" />
           </div>
-          <span className="font-black text-xl tracking-tighter text-slate-900 dark:text-white">{copy.brand}</span>
+          <span className="font-black text-xl tracking-tighter text-slate-700 dark:text-slate-400">{copy.brand}</span>
         </motion.div>
 
         <div className="flex items-center gap-4">
@@ -49,7 +50,7 @@ export default function TopBar({ onConnectClick, language, onLanguageToggle }: T
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
             onClick={toggleTheme}
-            className="p-2 rounded-lg hover:bg-white/50 text-slate-600 dark:text-slate-300 transition-colors"
+            className="p-2 rounded-lg hover:bg-white/50 text-slate-700 dark:text-slate-400 transition-colors"
           >
             {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
           </motion.button>

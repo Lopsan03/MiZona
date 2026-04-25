@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=Manrope:wght@400;500;700;800&display=swap');
 @import "tailwindcss";
 
 @theme {
@@ -76,6 +77,15 @@ body {
   @apply font-sans bg-background text-foreground overflow-hidden;
   height: 100vh;
   width: 100vw;
+}
+
+.font-hero {
+  font-family: "Archivo Black", sans-serif;
+  letter-spacing: 0.02em;
+}
+
+.font-body-alt {
+  font-family: "Manrope", sans-serif;
 }
 
 /* Pulse animation for markers */
