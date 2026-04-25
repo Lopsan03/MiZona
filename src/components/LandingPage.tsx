@@ -23,10 +23,6 @@ const pillars = [
     title: 'Comunitario',
     body: 'Las zonas rojas se actualizan por personas reales, no algoritmos de gobierno.',
   },
-  {
-    title: 'Predictivo',
-    body: 'Detecta patrones y evita rutas antes de que el incidente ocurra.',
-  },
 ];
 
 const steps = [
