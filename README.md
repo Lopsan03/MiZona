@@ -33,7 +33,7 @@ Hoy caminamos a ciegas.
 **Mi Zona** convierte a cada ciudadano en una fuente de información segura.
 
 Un mapa en tiempo real donde puedes:
-- Reportar asaltos y situaciones de riesgo
+- Reportar incidentes y situaciones de riesgo
 - Ver zonas peligrosas al instante
 - Tomar mejores decisiones al moverte por la ciudad
 
@@ -63,6 +63,39 @@ Para que nadie tenga que pagar de su bolsa al reportar, **Mi Zona transfiere una
 - El usuario mantiene control de su wallet
 - El reporte sigue siendo firmado por el usuario
 - El costo de transacción es cubierto por nosotros
+
+---
+
+## ⚖️ Marco Legal en México
+
+Esta propuesta es completamente legal en México y se sitúa en un área de oportunidad enorme debido a la crisis de seguridad.
+
+### Libertad de información y expresión
+En México, los artículos 6° y 7° constitucionales protegen el derecho a la información y la libertad de expresión.
+
+- Es legal compartir información sobre hechos observados en la vía pública.
+- La app funciona como un sistema de reporte ciudadano en tiempo real.
+
+### No sustituye una denuncia formal
+Mi Zona **no sustituye una denuncia ante el Ministerio Público**.
+
+- La plataforma es un canal de reporte informativo comunitario.
+- Opera como un "Waze de la seguridad", no como autoridad investigadora.
+
+### Privacidad y LFPDPPP
+El diseño con identidad criptográfica minimiza la exposición de datos personales.
+
+- Si la app no guarda nombre, correo, teléfono o IP, reduce significativamente obligaciones de tratamiento de datos personales.
+- El modelo exige mantener disociación real: la identidad criptográfica no debe poder vincularse a una persona física.
+
+### Modelo de negocio de data agregada
+La venta de analítica agregada (por ejemplo, patrones y estadísticas de riesgo) es legal en México cuando los datos están disociados.
+
+- No se comercializa identidad personal.
+- Se comercializa inteligencia territorial agregada para logística, seguros y planeación.
+- Esto cubre una brecha real frente a la cifra negra de delitos no denunciados.
+
+> Nota: Este resumen es informativo y no constituye asesoría legal.
 
 ---
 
